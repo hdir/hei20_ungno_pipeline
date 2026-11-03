@@ -1,0 +1,10 @@
+# torch installeres som CPU-variant i Dockerfile (Container Apps har ikke GPU)
+torch>=2.1.0
+sentence-transformers>=5.0.0
+scikit-learn>=1.4.0
+numpy>=1.26.0
+openai>=1.40.0
+lxml>=5.0.0
+requests>=2.31.0
+pyodbc>=5.0.0
+python-dotenv>=1.0.0
