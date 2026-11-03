@@ -345,19 +345,3 @@ Merk at PSA/SSA-steget filtrerer på `topic_top1`. Hvis du endrer navn på et ho
 
 ---
 
-## Endringer fra ungno_utils
-
-Dette prosjektet er en omskriving av `ungno_utils`. Det inneholder **bare koden som `run_pipeline.py` faktisk kjører**. Eksportskript, 12-månedersvarianten av discovery, `utils/`, gamle kopier og datafiler er tatt ut. Tabeller, kolonner, temaer, terskler og prompt er de samme, så eksisterende data og konsumenter fungerer som før.
-
-Tekniske endringer:
-
-- **Færre avhengigheter.** Steg 4 bruker `openai`-SDK-en direkte i stedet for `llama-index` og `langchain`. Kallene mot Azure OpenAI er de samme. `beautifulsoup4`, `pandas`, `transformers` (direkte) og `huggingface-hub` er fjernet. `scikit-learn` er nå en eksplisitt avhengighet.
-- **Mindre og mer robust image.** Imaget bruker CPU-torch, og embedding-modellen blir lastet ned ved bygg (`HF_HUB_OFFLINE=1` ved kjøring). Jobben er derfor ikke avhengig av Hugging Face, og `HF_TOKEN` er ikke lenger en secret. `AZURE_OPENAI_EMBEDDINGS_MODEL` og `PSA_SSA_INDEX_MONTHS_BACK` blir ikke brukt og er fjernet.
-- **Feilrettinger i crawlen:**
-  - Gamle `upsert_failed(status="worker_exception" / "db_write_failed")` skrev tekst til en INT-kolonne og feilet alltid. Nå blir `NULL` brukt.
-  - HTTP-sesjonen er nå per tråd. Før delte trådene én global sesjon.
-- **Kode og logging.** Duplisert kode (`connect_mssql` ×3, modellen lastet to ganger, ubrukt BeautifulSoup-parser, ubrukt «ikke-FAST»-modus) er fjernet. All logging går gjennom én logger (`ung_pipeline`).
-- **Steg 4 har CLI-flagg.** `--weeks`, `--overwrite` og `--max-rows` virker nå, og det gjør også env-variablene `DISCOVERY_WEEKS` og `DISCOVERY_OVERWRITE`. Den gamle README-en dokumenterte flagg som ikke fantes.
-- **Stien til `psa_ssa_topics.json`** blir nå regnet ut fra modulens plassering, ikke fra arbeidsmappen.
-
-Ressursnavnene i Azure er de samme. Et nytt image fra dette prosjektet kan derfor deployes rett på den eksisterende jobben med `.\deploy-job.ps1`. Kjør `.\create-job.ps1` først. Gamle env-vars som ikke lenger brukes (`HF_TOKEN`, `AZURE_OPENAI_EMBEDDINGS_MODEL`, `PSA_SSA_INDEX_MONTHS_BACK`) blir liggende på jobben, men er uskadelige. De kan fjernes med `az containerapp job update ... --remove-env-vars`.
